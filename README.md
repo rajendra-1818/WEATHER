@@ -6,10 +6,14 @@ A full-stack weather application featuring a native **Android app** (Kotlin/Jetp
 ![Kotlin](https://img.shields.io/badge/Kotlin-1.9-purple)
 ![React](https://img.shields.io/badge/React-18-61DAFB)
 ![Flask](https://img.shields.io/badge/Flask-3.x-green)
-![License](https://img.shields.io/badge/License-MIT-yellow)
 
 ---
+## Screenshots
+<img width="1183" height="836" alt="Screenshot 2026-02-25 at 9 59 54 PM" src="https://github.com/user-attachments/assets/5656c9aa-ee5e-4136-8014-6fd5cb4b72e4" />
 
+<img width="352" height="723" alt="Screenshot 2026-02-25 at 9 57 58 PM" src="https://github.com/user-attachments/assets/df7bb720-359c-422e-8c5a-8a8e4bc9d77e" />
+<img width="351" height="709" alt="Screenshot 2026-02-25 at 9 57 52 PM" src="https://github.com/user-attachments/assets/15b83db1-850b-4c93-806a-2d3c3bd7b49b" />
+---
 ## 📋 Table of Contents
 
 - [Features](#-features)
@@ -384,7 +388,8 @@ The app uses a **glassmorphism** design language with dynamic weather-themed gra
 - `pytest==7.4.3`
 
 ---
+<img width="1183" height="836" alt="Screenshot 2026-02-25 at 9 59 54 PM" src="https://github.com/user-attachments/assets/5656c9aa-ee5e-4136-8014-6fd5cb4b72e4" />
 
-## 📄 License
+<img width="352" height="723" alt="Screenshot 2026-02-25 at 9 57 58 PM" src="https://github.com/user-attachments/assets/df7bb720-359c-422e-8c5a-8a8e4bc9d77e" />
+<img width="351" height="709" alt="Screenshot 2026-02-25 at 9 57 52 PM" src="https://github.com/user-attachments/assets/15b83db1-850b-4c93-806a-2d3c3bd7b49b" />
 
-This project is licensed under the MIT License.
