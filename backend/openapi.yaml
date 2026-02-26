@@ -1,0 +1,406 @@
+openapi: 3.0.3
+info:
+  title: Weather App API
+  description: |
+    RESTful API for the Weather application providing current weather data,
+    5-day forecasts, geocoding, and saved location management.
+    
+    Built with Python Flask, SQLAlchemy ORM, and SQLite database.
+    Integrates with OpenWeatherMap API for real-time weather data.
+  version: 1.0.0
+  contact:
+    name: Weather App Team
+  license:
+    name: MIT
+
+servers:
+  - url: http://localhost:5000/api
+    description: Local development server
+  - url: https://api.weather-app.com/api
+    description: Production server
+
+paths:
+  /health:
+    get:
+      summary: Health Check
+      operationId: healthCheck
+      tags: [System]
+      responses:
+        '200':
+          description: Service is healthy
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  status:
+                    type: string
+                    example: healthy
+                  service:
+                    type: string
+                    example: Weather API
+                  version:
+                    type: string
+                    example: 1.0.0
+
+  /weather/current:
+    get:
+      summary: Get Current Weather
+      description: Returns current weather conditions for given coordinates.
+      operationId: getCurrentWeather
+      tags: [Weather]
+      parameters:
+        - name: lat
+          in: query
+          required: true
+          schema:
+            type: number
+            format: float
+          description: Latitude coordinate
+          example: 40.7128
+        - name: lon
+          in: query
+          required: true
+          schema:
+            type: number
+            format: float
+          description: Longitude coordinate
+          example: -74.0060
+        - name: units
+          in: query
+          schema:
+            type: string
+            enum: [metric, imperial, standard]
+            default: metric
+          description: Temperature units
+      responses:
+        '200':
+          description: Current weather data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/CurrentWeather'
+        '400':
+          description: Missing required parameters
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Error'
+
+  /weather/forecast:
+    get:
+      summary: Get 5-Day Forecast
+      description: Returns 5-day/3-hour weather forecast.
+      operationId: getForecast
+      tags: [Weather]
+      parameters:
+        - name: lat
+          in: query
+          required: true
+          schema:
+            type: number
+            format: float
+        - name: lon
+          in: query
+          required: true
+          schema:
+            type: number
+            format: float
+        - name: units
+          in: query
+          schema:
+            type: string
+            enum: [metric, imperial, standard]
+            default: metric
+      responses:
+        '200':
+          description: 5-day forecast data
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Forecast'
+        '400':
+          description: Missing required parameters
+
+  /weather/geocode:
+    get:
+      summary: Geocode City Name
+      description: Convert city name to geographic coordinates.
+      operationId: geocode
+      tags: [Weather]
+      parameters:
+        - name: q
+          in: query
+          required: true
+          schema:
+            type: string
+          description: City name to search
+          example: New York
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 5
+      responses:
+        '200':
+          description: List of matching locations
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/GeoLocation'
+
+  /weather/reverse-geocode:
+    get:
+      summary: Reverse Geocode
+      description: Convert coordinates to location name.
+      operationId: reverseGeocode
+      tags: [Weather]
+      parameters:
+        - name: lat
+          in: query
+          required: true
+          schema:
+            type: number
+            format: float
+        - name: lon
+          in: query
+          required: true
+          schema:
+            type: number
+            format: float
+      responses:
+        '200':
+          description: Location information
+
+  /locations/:
+    get:
+      summary: Get Saved Locations
+      operationId: getLocations
+      tags: [Locations]
+      responses:
+        '200':
+          description: List of saved locations
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/SavedLocation'
+    post:
+      summary: Add Saved Location
+      operationId: addLocation
+      tags: [Locations]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LocationInput'
+      responses:
+        '201':
+          description: Location created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/SavedLocation'
+        '400':
+          description: Invalid input
+
+  /locations/{id}:
+    put:
+      summary: Update Saved Location
+      operationId: updateLocation
+      tags: [Locations]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/LocationInput'
+      responses:
+        '200':
+          description: Location updated
+    delete:
+      summary: Delete Saved Location
+      operationId: deleteLocation
+      tags: [Locations]
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Location deleted
+
+  /locations/search-history:
+    get:
+      summary: Get Search History
+      operationId: getSearchHistory
+      tags: [Locations]
+      parameters:
+        - name: limit
+          in: query
+          schema:
+            type: integer
+            default: 10
+      responses:
+        '200':
+          description: Recent search history
+    post:
+      summary: Record Search
+      operationId: addSearchHistory
+      tags: [Locations]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [query]
+              properties:
+                query:
+                  type: string
+                latitude:
+                  type: number
+                longitude:
+                  type: number
+                result_name:
+                  type: string
+      responses:
+        '201':
+          description: Search recorded
+
+components:
+  schemas:
+    CurrentWeather:
+      type: object
+      properties:
+        coord:
+          type: object
+          properties:
+            lon:
+              type: number
+            lat:
+              type: number
+        weather:
+          type: array
+          items:
+            type: object
+            properties:
+              id:
+                type: integer
+              main:
+                type: string
+              description:
+                type: string
+              icon:
+                type: string
+        main:
+          type: object
+          properties:
+            temp:
+              type: number
+            feels_like:
+              type: number
+            temp_min:
+              type: number
+            temp_max:
+              type: number
+            pressure:
+              type: integer
+            humidity:
+              type: integer
+        wind:
+          type: object
+          properties:
+            speed:
+              type: number
+            deg:
+              type: integer
+        name:
+          type: string
+
+    Forecast:
+      type: object
+      properties:
+        list:
+          type: array
+          items:
+            type: object
+        city:
+          type: object
+
+    GeoLocation:
+      type: object
+      properties:
+        name:
+          type: string
+        lat:
+          type: number
+        lon:
+          type: number
+        country:
+          type: string
+        state:
+          type: string
+
+    SavedLocation:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string
+        latitude:
+          type: number
+        longitude:
+          type: number
+        country:
+          type: string
+        state:
+          type: string
+        is_default:
+          type: boolean
+        created_at:
+          type: string
+          format: date-time
+
+    LocationInput:
+      type: object
+      required: [name, latitude, longitude]
+      properties:
+        name:
+          type: string
+        latitude:
+          type: number
+        longitude:
+          type: number
+        country:
+          type: string
+        state:
+          type: string
+        is_default:
+          type: boolean
+
+    Error:
+      type: object
+      properties:
+        error:
+          type: string
+
+tags:
+  - name: System
+    description: System health and status
+  - name: Weather
+    description: Weather data and geocoding
+  - name: Locations
+    description: Saved location management
