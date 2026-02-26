@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="sky_blue">#FF4FC3F7</color>
+    <color name="sky_blue_dark">#FF0288D1</color>
+    <color name="deep_blue">#FF01579B</color>
+    <color name="sunset_orange">#FFFF8A65</color>
+    <color name="white">#FFFFFFFF</color>
+    <color name="black">#FF000000</color>
+</resources>
